@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { Suspense } from 'react'
 import { Toaster } from 'sonner'
 import './globals.css'
 
@@ -73,7 +74,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ProgressBar />
+          <Suspense fallback={null}>
+            <ProgressBar />
+          </Suspense>
           <div className="relative flex flex-col h-[100svh] overflow-hidden">
             <main className="flex-1 overflow-y-auto pb-20">
               {children}

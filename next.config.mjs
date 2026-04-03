@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ['sao-goat-molecular-monica.trycloudflare.com', '192.168.0.106'],
   typescript: {
     ignoreBuildErrors: true,
   },

@@ -1,9 +1,9 @@
 /**
  * Quick QR Service Worker - Optimised for Offline Use and Rapid Loading
- * Version: 20260403221454
+ * Version: 20260403230836
  */
 
-const CACHE_NAME = 'quickqr-cache-20260403221454'
+const CACHE_NAME = 'quickqr-cache-20260403230836'
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
