@@ -1,6 +1,6 @@
 # QuickQR
 
-**One Simple Scan. Zero Ads. Total Privacy.**
+**Just Scan It**
 
 QuickQR exists to avoid excessive ads and unnecessary permissions for a simple scan. It’s open-source, ad-free, privacy-first, offline friendly Progressive Web App.
 
