@@ -14,7 +14,11 @@ import { useFlashlight } from '@/hooks/useFlashlight'
 import { useVibration } from '@/hooks/useVibration'
 import { useScanHistory } from '@/hooks/useScanHistory'
 import { useScanSettings } from '@/hooks/useScanSettings'
-import { Scan, History, Settings as SettingsIcon } from 'lucide-react'
+import { Scan, History, Settings as SettingsIcon, Camera, FileText } from 'lucide-react'
+import { SplashScreen } from '@/components/SplashScreen'
+import { PermissionModal } from '@/components/PermissionModal'
+import { toast } from 'sonner'
+import { Html5Qrcode } from 'html5-qrcode'
 
 export default function Page() {
   const [activeTab, setActiveTab] = useState('scan')
@@ -22,9 +26,27 @@ export default function Page() {
   const [isCopied, setIsCopied] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [isInstallable, setIsInstallable] = useState(false)
+  const [hasStartedScanning, setHasStartedScanning] = useState(false)
+  const [isPermissionModalOpen, setIsPermissionModalOpen] = useState(false)
+  const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Hooks
-  const { videoRef: cameraVideoRef, startCamera, stopCamera, toggleCamera, hasMultipleCameras, error: cameraError } = useCamera()
+  const { 
+    videoRef: cameraVideoRef, 
+    startCamera, 
+    stopCamera, 
+    pauseCamera, 
+    resumeCamera, 
+    toggleCamera, 
+    hasMultipleCameras, 
+    error: cameraError, 
+    isCameraActive,
+    isPaused,
+    zoom,
+    setZoom,
+    zoomRange
+  } = useCamera()
   const scannerRef = useRef<MediaStream | null>(null)
   const { isFlashlightOn, toggleFlashlight, isSupported: flashlightSupported } = useFlashlight(scannerRef)
   const { vibrate } = useVibration()
@@ -75,11 +97,21 @@ export default function Page() {
     }
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    
+    // Check if already in standalone mode
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true
+    
+    if (isStandalone) {
+      setIsInstallable(false)
+    } else if (isIOS) {
+      // On iOS, native prompt doesn't exist, but we show instructions anyway
+      setIsInstallable(true)
+    }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     }
-  }, [])
+  }, [isIOS])
 
   const handleInstallApp = async () => {
     if (deferredPrompt) {
@@ -89,6 +121,15 @@ export default function Page() {
         setDeferredPrompt(null)
         setIsInstallable(false)
       }
+    } else if (isIOS) {
+      toast.info('On iOS, tap the share icon below and select "Add to Home Screen"', {
+        duration: 8000,
+        id: 'ios-install-inst'
+      })
+    } else {
+      toast.info('Use your browser menu to "Install" or "Add to Home Screen"', {
+        id: 'generic-install-inst'
+      })
     }
   }
 
@@ -101,13 +142,143 @@ export default function Page() {
     }
   }, [])
 
-  // Start camera on mount
+  // Start camera if started scanning
   useEffect(() => {
-    startCamera()
+    if (hasStartedScanning && activeTab === 'scan') {
+      startCamera()
+    }
     return () => {
       stopCamera()
     }
-  }, [])
+  }, [hasStartedScanning, activeTab, startCamera, stopCamera])
+
+  // Continuous Scanning Logic (Supports scanning even when paused/frozen)
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null
+    const html5QrCode = new Html5Qrcode("reader-hidden")
+
+    if (hasStartedScanning && activeTab === 'scan' && isCameraActive && cameraVideoRef.current) {
+      interval = setInterval(async () => {
+        if (!cameraVideoRef.current || isResultModalOpen) return
+
+        try {
+          // Capture current frame from video (works even if video.pause() was called)
+          const canvas = document.createElement('canvas')
+          canvas.width = cameraVideoRef.current.videoWidth
+          canvas.height = cameraVideoRef.current.videoHeight
+          const ctx = canvas.getContext('2d')
+          if (!ctx) return
+          ctx.drawImage(cameraVideoRef.current, 0, 0)
+          
+          canvas.toBlob(async (blob) => {
+            if (!blob) return
+            const file = new File([blob], 'scan.jpg', { type: 'image/jpeg' })
+            try {
+              const decodedText = await html5QrCode.scanFile(file, false)
+              handleScanSuccess({
+                text: decodedText,
+                format: 'QR_CODE',
+                timestamp: new Date()
+              })
+            } catch (err) {
+              // No QR code found in this frame, ignore
+            }
+          }, 'image/jpeg', 0.8)
+        } catch (err) {
+          console.error('Scan loop error:', err)
+        }
+      }, 500) // Scan every 500ms
+    }
+
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [hasStartedScanning, activeTab, isCameraActive, isResultModalOpen])
+
+  const handleStartScanningClick = async () => {
+    try {
+      // Check if permission API is supported
+      if (navigator.permissions && navigator.permissions.query) {
+        const result = await navigator.permissions.query({ name: 'camera' as PermissionName })
+        if (result.state === 'granted') {
+          setHasStartedScanning(true)
+          return
+        }
+      }
+      
+      // If not granted or API not supported, show the modal
+      setIsPermissionModalOpen(true)
+    } catch (err) {
+      console.error('Error checking permissions:', err)
+      setIsPermissionModalOpen(true)
+    }
+  }
+
+  const handleCameraPermissionRequest = async () => {
+    setIsPermissionModalOpen(false)
+    try {
+      await startCamera()
+      setHasStartedScanning(true)
+    } catch (err) {
+      toast.error('Failed to access camera. Please check your browser settings.')
+    }
+  }
+
+  const handleFileAccessRequest = () => {
+    setIsPermissionModalOpen(false)
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const html5QrCode = new Html5Qrcode("reader-hidden")
+    try {
+      toast.loading('Scanning image...', { id: 'file-scan' })
+      const decodedText = await html5QrCode.scanFile(file, true)
+      toast.success('QR Code found!', { id: 'file-scan' })
+      
+      handleScanSuccess({
+        text: decodedText,
+        format: 'QR_CODE',
+        timestamp: new Date()
+      })
+      setHasStartedScanning(true)
+    } catch (err) {
+      toast.error('No QR code found in this image.', { id: 'file-scan' })
+    } finally {
+      // Reset input
+      e.target.value = ''
+    }
+  }
+
+  if (!hasStartedScanning) {
+    return (
+      <>
+        <SplashScreen 
+          onStartClick={handleStartScanningClick} 
+          isInstallable={isInstallable}
+          onInstall={handleInstallApp}
+        />
+        <PermissionModal 
+          isOpen={isPermissionModalOpen}
+          onClose={() => setIsPermissionModalOpen(false)}
+          onCameraClick={handleCameraPermissionRequest}
+          onFileClick={handleFileAccessRequest}
+        />
+        {/* These will be rendered below as well, but for early return we need them here or move them to layout */}
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          className="hidden" 
+          accept="image/*" 
+          onChange={handleFileChange}
+        />
+        <div id="reader-hidden" className="hidden" />
+      </>
+    )
+  }
 
   return (
     <div className="w-screen h-screen fixed inset-0 bg-background overflow-hidden">
@@ -117,11 +288,15 @@ export default function Page() {
           {/* Content Area */}
           <TabsContent value="scan" className="flex-1 m-0 data-[state=inactive]:hidden">
             <CameraScanner
-              isScanning={activeTab === 'scan'}
+              isScanning={activeTab === 'scan' && !isPaused}
               onStartScan={async () => {
-                await startCamera()
+                if (isPaused) {
+                  resumeCamera()
+                } else {
+                  await startCamera()
+                }
               }}
-              onStopScan={stopCamera}
+              onStopScan={pauseCamera}
               onToggleCamera={toggleCamera}
               isFlashlightOn={isFlashlightOn}
               onToggleFlashlight={toggleFlashlight}
@@ -129,6 +304,14 @@ export default function Page() {
               cameraError={cameraError}
               videoRef={cameraVideoRef}
               hasMultipleCameras={hasMultipleCameras}
+              onFileSelect={handleFileAccessRequest}
+              onBack={() => {
+                stopCamera()
+                setHasStartedScanning(false)
+              }}
+              zoom={zoom}
+              onZoomChange={setZoom}
+              zoomRange={zoomRange}
             />
           </TabsContent>
 
@@ -193,6 +376,16 @@ export default function Page() {
           </div>
         </Tabs>
       </div>
+
+      {/* Hidden input and reader for file scanning - Available globally */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={handleFileChange}
+      />
+      <div id="reader-hidden" className="hidden" />
 
       {/* Result Modal */}
       <ScanResultModal
