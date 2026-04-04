@@ -85,5 +85,3 @@ If QuickQR has helped you, consider supporting the development!
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-
-Built with ❤️ by [dipcb05](https://github.com/dipcb05)
