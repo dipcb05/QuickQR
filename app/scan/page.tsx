@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback, useEffect, Suspense } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { ScanResultModal } from '@/components/ScanResultModal'
 import { PermissionModal } from '@/components/PermissionModal'
@@ -27,20 +27,9 @@ export default function ScanPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const {
-    videoRef: cameraVideoRef,
-    startCamera,
-    stopCamera,
-    pauseCamera,
-    resumeCamera,
-    toggleCamera,
-    hasMultipleCameras,
-    error: cameraError,
-    isCameraActive,
-    isPaused,
-    zoom,
-    setZoom,
-    zoomRange,
-    streamRef
+    videoRef: cameraVideoRef, startCamera, stopCamera, pauseCamera, resumeCamera,
+    toggleCamera, hasMultipleCameras, error: cameraError, isCameraActive,
+    isPaused, zoom, setZoom, zoomRange, streamRef
   } = useCamera()
 
   const { isFlashlightOn, toggleFlashlight, isSupported: flashlightSupported } = useFlashlight(streamRef)
@@ -92,7 +81,7 @@ export default function ScanPage() {
     if (settings.vibrationEnabled) vibrate(100)
     if (settings.soundEnabled) {
       const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2216/2216-preview.mp3')
-      audio.play().catch(() => { })
+      audio.play().catch(() => {})
     }
 
     if (settings.autoCopyToClipboard && navigator.clipboard) {
@@ -136,7 +125,6 @@ export default function ScanPage() {
     if (!file) return
 
     e.target.value = ''
-
     toast.loading('Decoding image...', { id: 'file-decode' })
 
     try {
@@ -198,7 +186,7 @@ export default function ScanPage() {
         result={currentScan}
         isCopied={isCopied}
         onCopy={handleCopyToClipboard}
-        onShare={async () => { }}
+        onShare={async () => {}}
       />
       <PermissionModal
         isOpen={isPermissionModalOpen}

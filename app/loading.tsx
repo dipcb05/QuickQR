@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react'
 import { motion } from 'framer-motion'
 import { Scan } from 'lucide-react'
 
@@ -33,21 +32,14 @@ export default function Loading() {
           Loading...
         </h2>
         <div className="flex items-center justify-center gap-1.5">
-          <motion.div
-            animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-            className="w-1.5 h-1.5 rounded-full bg-primary"
-          />
-          <motion.div
-            animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
-            className="w-1.5 h-1.5 rounded-full bg-primary"
-          />
-          <motion.div
-            animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
-            className="w-1.5 h-1.5 rounded-full bg-primary"
-          />
+          {[0, 0.2, 0.4].map((delay, i) => (
+            <motion.div
+              key={i}
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay }}
+              className="w-1.5 h-1.5 rounded-full bg-primary"
+            />
+          ))}
         </div>
       </motion.div>
 

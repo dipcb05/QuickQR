@@ -9,7 +9,7 @@ export const useVibration = (): UseVibrationReturn => {
   const [isSupported, setIsSupported] = useState(false)
 
   useEffect(() => {
-    setIsSupported(!!navigator.vibrate)
+    setIsSupported(typeof navigator !== 'undefined' && !!navigator.vibrate)
   }, [])
 
   const vibrate = useCallback((pattern: number | number[] = 200) => {

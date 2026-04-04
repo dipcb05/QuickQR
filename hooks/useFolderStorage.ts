@@ -47,9 +47,7 @@ export const useFolderStorage = (): UseFolderStorageReturn => {
             setIsPermissionRequired(true)
           }
         }
-      } catch (err) {
-        console.error('Failed to load folder handle:', err)
-      }
+      } catch { }
     }
     loadHandle()
   }, [])
@@ -79,7 +77,6 @@ export const useFolderStorage = (): UseFolderStorageReturn => {
       return true
     } catch (err: any) {
       if (err.name !== 'AbortError') {
-        console.error('Failed to connect folder:', err)
         toast.error('Failed to connect folder')
       }
       return false
@@ -103,8 +100,7 @@ export const useFolderStorage = (): UseFolderStorageReturn => {
         toast.error('Permission denied')
         return false
       }
-    } catch (err) {
-      console.error('Failed to reconnect folder:', err)
+    } catch {
       await connectFolder()
       return false
     }
@@ -124,29 +120,25 @@ export const useFolderStorage = (): UseFolderStorageReturn => {
       const scansDir = await handle.getDirectoryHandle('Scans', { create: true })
       const baseFileName = `${timestamp.replace(/[:.]/g, '-')}-${id.slice(0, 4)}`
 
-      const dataFileName = `${baseFileName}.json`
-      const dataFileHandle = await scansDir.getFileHandle(dataFileName, { create: true })
+      const dataFileHandle = await scansDir.getFileHandle(`${baseFileName}.json`, { create: true })
       const dataWritable = await (dataFileHandle as any).createWritable()
       await dataWritable.write(JSON.stringify({ id, text, format, timestamp }, null, 2))
       await dataWritable.close()
 
-      const txtFileName = `${baseFileName}.txt`
-      const txtFileHandle = await scansDir.getFileHandle(txtFileName, { create: true })
+      const txtFileHandle = await scansDir.getFileHandle(`${baseFileName}.txt`, { create: true })
       const txtWritable = await (txtFileHandle as any).createWritable()
       await txtWritable.write(text)
       await txtWritable.close()
 
       if (imageBlob) {
-        const imageFileName = `${baseFileName}.jpg`
-        const imageFileHandle = await scansDir.getFileHandle(imageFileName, { create: true })
+        const imageFileHandle = await scansDir.getFileHandle(`${baseFileName}.jpg`, { create: true })
         const imageWritable = await (imageFileHandle as any).createWritable()
         await imageWritable.write(imageBlob)
         await imageWritable.close()
       }
 
       return true
-    } catch (err) {
-      console.error('Failed to save to folder:', err)
+    } catch {
       return false
     }
   }, [handle])

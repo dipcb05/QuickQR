@@ -3,32 +3,42 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Suspense } from 'react'
 import { Toaster } from 'sonner'
+import { ThemeProvider } from '@/components/ThemeProvider'
+import { Navigation } from '@/components/Navigation'
+import { ProgressBar } from '@/components/ProgressBar'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const geistSans = Geist({ subsets: ['latin'], display: 'swap', variable: '--font-geist-sans' })
+const geistMono = Geist_Mono({ subsets: ['latin'], display: 'swap', variable: '--font-geist-mono' })
 
 export const metadata: Metadata = {
-  title: 'Quick QR - Fast Barcode & QR Scanner PWA',
-  description: 'Fast, offline-capable barcode and QR code scanner for iOS, Android, and desktop with full-featured history and settings management.',
+  title: {
+    default: 'Quick QR - Fast Barcode & QR Scanner PWA',
+    template: '%s | Quick QR',
+  },
+  description: 'Scan, create, and share QR codes instantly. Fast, offline-capable barcode and QR code scanner for iOS, Android, and desktop. Ad-free and privacy-first.',
   manifest: '/manifest.json',
-  generator: 'v0.app',
-  keywords: ['barcode', 'qr code', 'scanner', 'pwa', 'offline'],
-  authors: [{ name: 'Quick QR' }],
+  keywords: ['barcode', 'qr code', 'scanner', 'pwa', 'offline', 'qr generator', 'privacy'],
+  authors: [{ name: 'Quick QR', url: 'https://quickqr.app' }],
+  openGraph: {
+    type: 'website',
+    title: 'Quick QR - Fast Barcode & QR Scanner',
+    description: 'Scan, create, and share QR codes instantly. Ad-free, offline-capable, and privacy-first.',
+    siteName: 'Quick QR',
+    images: [{ url: '/icon-512x512.png', width: 512, height: 512, alt: 'Quick QR Logo' }],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Quick QR - Fast Barcode & QR Scanner',
+    description: 'Scan, create, and share QR codes instantly. Ad-free, offline-capable, and privacy-first.',
+    images: ['/icon-512x512.png'],
+  },
   icons: {
     icon: [
-      {
-        url: '/icon-192x192.png',
-        sizes: '192x192',
-        type: 'image/png',
-      },
-      {
-        url: '/icon-512x512.png',
-        sizes: '512x512',
-        type: 'image/png',
-      },
+      { url: '/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
-    apple: '/apple-icon-180x180.png',
+    apple: '/apple-icon-180.png',
   },
   appleWebApp: {
     capable: true,
@@ -46,11 +56,7 @@ export const viewport: Viewport = {
   userScalable: true,
 }
 
-import { ThemeProvider } from '@/components/ThemeProvider'
-
-import { Navigation } from '@/components/Navigation'
-
-import { ProgressBar } from '@/components/ProgressBar'
+const SW_REGISTER_SCRIPT = `if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js')})}`
 
 export default function RootLayout({
   children,
@@ -58,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -66,6 +72,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Quick QR" />
         <meta name="msapplication-TileColor" content="#0d0013" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
+        <link rel="dns-prefetch" href="https://assets.mixkit.co" />
       </head>
       <body className="font-sans antialiased min-h-screen bg-background overscroll-none">
         <ThemeProvider
@@ -86,24 +93,7 @@ export default function RootLayout({
           <Toaster closeButton richColors position="top-center" />
           <Analytics />
           {process.env.NODE_ENV === 'production' && (
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `
-                  if ('serviceWorker' in navigator) {
-                    window.addEventListener('load', function() {
-                      navigator.serviceWorker.register('/sw.js').then(
-                        function(registration) {
-                          console.log('[SW] Registered successfully');
-                        },
-                        function(err) {
-                          console.error('[SW] Registration failed: ', err);
-                        }
-                      );
-                    });
-                  }
-                `
-              }}
-            />
+            <script dangerouslySetInnerHTML={{ __html: SW_REGISTER_SCRIPT }} />
           )}
         </ThemeProvider>
       </body>

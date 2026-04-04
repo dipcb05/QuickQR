@@ -3,7 +3,7 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { X, Camera, Shield, CheckCircle2 } from 'lucide-react'
+import { Camera, Shield } from 'lucide-react'
 
 interface PermissionModalProps {
   isOpen: boolean

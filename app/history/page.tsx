@@ -26,7 +26,6 @@ export default function HistoryPage() {
         })
         if (saved) savedCount++
       }
-
       if (savedCount > 0) {
         toast.success(`Synced ${savedCount} records to your local folder`, { id: 'history-sync' })
       } else {
@@ -35,7 +34,7 @@ export default function HistoryPage() {
     }
   }, [reconnectFolder, history, saveScanToFolder])
 
-  const handleCopy = useCallback((text: string, id: string) => {
+  const handleCopy = useCallback((text: string) => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text)
       incrementCopyCount(text)
@@ -56,7 +55,7 @@ export default function HistoryPage() {
         toast.info('Copied! (Native share not supported)')
       }
     } catch (err) {
-      if ((err as Error).name !== 'AbortError') console.error('Share error:', err)
+      if ((err as Error).name !== 'AbortError') { }
     }
   }, [])
 

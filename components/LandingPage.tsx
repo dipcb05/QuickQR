@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { Scan, Shield, Zap, Database, Smartphone, Download } from 'lucide-react'
+import { Shield, Zap, Database, Smartphone, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
 export function LandingPage() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
   const [isInstallable, setIsInstallable] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
 
@@ -41,8 +41,8 @@ export function LandingPage() {
 
   const handleInstallClick = async () => {
     if (deferredPrompt) {
-      deferredPrompt.prompt()
-      const { outcome } = await deferredPrompt.userChoice
+      (deferredPrompt as any).prompt()
+      const { outcome } = await (deferredPrompt as any).userChoice
       if (outcome === 'accepted') {
         setDeferredPrompt(null)
         setIsInstallable(false)
@@ -75,6 +75,13 @@ export function LandingPage() {
     return <div className="min-h-screen bg-background" />
   }
 
+  const features = [
+    { icon: Zap, label: 'Ad-Free', color: 'text-amber-500' },
+    { icon: Shield, label: 'Private', color: 'text-green-500' },
+    { icon: Database, label: 'History', color: 'text-blue-500' },
+    { icon: Smartphone, label: 'Offline', color: 'text-purple-500' },
+  ]
+
   return (
     <div className="relative flex flex-col items-center justify-center min-h-[100svh] px-6 text-center space-y-10 pb-20 pt-8 overflow-hidden">
       <div className="fixed top-6 right-6 z-[120]">
@@ -92,6 +99,9 @@ export function LandingPage() {
             <img
               src="/logo.png"
               alt="Quick QR Logo"
+              width={96}
+              height={96}
+              loading="eager"
               className="w-full h-full object-contain rounded-3xl"
             />
           </div>
@@ -99,7 +109,7 @@ export function LandingPage() {
 
         <motion.div variants={item} className="space-y-4 px-2">
           <p className="text-base font-bold text-foreground/80 italic">
-            Just scan. That’s it.
+            Just scan. That's it.
           </p>
         </motion.div>
 
@@ -139,25 +149,13 @@ export function LandingPage() {
         transition={{ delay: 0.5 }}
         className="grid grid-cols-2 gap-4 w-full max-w-md"
       >
-        <div className="p-4 rounded-2xl bg-card/60 border border-border shadow-sm space-y-2 text-left backdrop-blur-sm">
-          <Zap className="w-4 h-4 text-amber-500" />
-          <h3 className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground/80">Ad-Free</h3>
-        </div>
-        <div className="p-4 rounded-2xl bg-card/60 border border-border shadow-sm space-y-2 text-left backdrop-blur-sm">
-          <Shield className="w-4 h-4 text-green-500" />
-          <h3 className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground/80">Private</h3>
-        </div>
-        <div className="p-4 rounded-2xl bg-card/60 border border-border shadow-sm space-y-2 text-left backdrop-blur-sm">
-          <Database className="w-4 h-4 text-blue-500" />
-          <h3 className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground/80">History</h3>
-        </div>
-        <div className="p-4 rounded-2xl bg-card/60 border border-border shadow-sm space-y-2 text-left backdrop-blur-sm">
-          <Smartphone className="w-4 h-4 text-purple-500" />
-          <h3 className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground/80">Offline</h3>
-        </div>
+        {features.map((feature) => (
+          <div key={feature.label} className="p-4 rounded-2xl bg-card/60 border border-border shadow-sm space-y-2 text-left backdrop-blur-sm">
+            <feature.icon className={`w-4 h-4 ${feature.color}`} />
+            <h3 className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground/80">{feature.label}</h3>
+          </div>
+        ))}
       </motion.div>
-
-
     </div>
   )
 }

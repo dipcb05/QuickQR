@@ -4,7 +4,7 @@ import { SettingsTab } from '@/components/SettingsTab'
 import { useScanSettings } from '@/hooks/useScanSettings'
 import { useFolderStorage } from '@/hooks/useFolderStorage'
 import { useScanHistory } from '@/hooks/useScanHistory'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { toast } from 'sonner'
 
 export default function SettingsPage() {
@@ -12,9 +12,8 @@ export default function SettingsPage() {
   const { isFolderConnected, folderName, connectFolder, saveScanToFolder } = useFolderStorage()
   const { history } = useScanHistory()
 
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<Event | null>(null)
   const [isInstallable, setIsInstallable] = useState(false)
-  const isIOS = typeof window !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -26,7 +25,7 @@ export default function SettingsPage() {
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
   }, [])
 
-  const handleConnectFolder = async () => {
+  const handleConnectFolder = useCallback(async () => {
     const success = await connectFolder()
     if (success && history.length > 0) {
       toast.loading('Syncing history to folder...', { id: 'settings-sync' })
@@ -46,18 +45,18 @@ export default function SettingsPage() {
         toast.dismiss('settings-sync')
       }
     }
-  }
+  }, [connectFolder, history, saveScanToFolder])
 
-  const handleInstallApp = async () => {
+  const handleInstallApp = useCallback(async () => {
     if (deferredPrompt) {
-      deferredPrompt.prompt()
-      const { outcome } = await deferredPrompt.userChoice
+      (deferredPrompt as any).prompt()
+      const { outcome } = await (deferredPrompt as any).userChoice
       if (outcome === 'accepted') {
         setDeferredPrompt(null)
         setIsInstallable(false)
       }
     }
-  }
+  }, [deferredPrompt])
 
   return (
     <div className="h-full bg-background">

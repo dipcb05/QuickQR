@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
-import { Zap, ZapOff, RotateCw, Pause, Play, ImageIcon, Home, X, Minus, Plus } from 'lucide-react'
+import { RotateCw, Pause, Play, ImageIcon, Home, X, Minus, Plus } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Slider } from '@/components/ui/slider'
 import Link from 'next/link'
@@ -30,6 +30,11 @@ interface CameraScannerProps {
 }
 
 type EngineTier = 'native' | 'html5-qrcode' | 'jsqr'
+
+const NATIVE_FORMATS = [
+  'qr_code', 'ean_13', 'ean_8', 'code_128', 'code_39',
+  'upc_a', 'upc_e', 'codabar', 'itf', 'data_matrix', 'aztec', 'pdf417'
+]
 
 export function CameraScanner({
   isScanning,
@@ -70,11 +75,7 @@ export function CameraScanner({
 
     const emitResult = (text: string, format: string) => {
       if (text.trim().length > 0 && running && !isPausedRef.current) {
-        onScanSuccessRef.current({
-          text,
-          format,
-          timestamp: new Date(),
-        })
+        onScanSuccessRef.current({ text, format, timestamp: new Date() })
       }
     }
 
@@ -95,9 +96,7 @@ export function CameraScanner({
         if (!formats || formats.length === 0) return false
 
         const detector = new (window as any).BarcodeDetector({
-          formats: formats.filter((f: string) =>
-            ['qr_code', 'ean_13', 'ean_8', 'code_128', 'code_39', 'upc_a', 'upc_e', 'codabar', 'itf', 'data_matrix', 'aztec', 'pdf417'].includes(f)
-          ),
+          formats: formats.filter((f: string) => NATIVE_FORMATS.includes(f)),
         })
         setActiveTier('native')
 
@@ -194,7 +193,7 @@ export function CameraScanner({
     const initEngine = async () => {
       if (await tryNativeDetector()) return
       if (await tryHtml5Qrcode()) return
-      if (await tryJsQR()) return
+      await tryJsQR()
     }
 
     initEngine()

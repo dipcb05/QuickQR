@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo, memo } from 'react'
+import React, { useState, useMemo, memo, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -54,9 +54,9 @@ export function HistoryTab({
   const [isExportModalOpen, setIsExportModalOpen] = useState(false)
   const [exportStartDate, setExportStartDate] = useState('')
   const [exportEndDate, setExportEndDate] = useState('')
-  const [isMounted, setIsMounted] = React.useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsMounted(true)
   }, [])
 
@@ -81,11 +81,6 @@ export function HistoryTab({
         staggerChildren: 0.05,
       },
     },
-  }
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 },
   }
 
   return (

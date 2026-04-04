@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { Html5QrcodeScanner, Html5Qrcode } from 'html5-qrcode'
+import { Html5QrcodeScanner, Html5QrcodeSupportedFormats } from 'html5-qrcode'
 
 export interface ScanResult {
   text: string
@@ -35,40 +35,36 @@ export const useBarcodeScannerEngine = (
         fps: 10,
         qrbox: { width: 250, height: 250 },
         formatsToSupport: [
-          'QR_CODE',
-          'UPC_A',
-          'UPC_E',
-          'EAN_13',
-          'EAN_8',
-          'CODE_128',
-          'CODE_39',
-          'CODABAR',
-          'ITF',
-          'RSS_14',
-          'RSS_EXPANDED',
-          'PDF_417',
-          'DATAMATRIX',
-          'AZTEC',
+          Html5QrcodeSupportedFormats.QR_CODE,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.CODABAR,
+          Html5QrcodeSupportedFormats.ITF,
+          Html5QrcodeSupportedFormats.RSS_14,
+          Html5QrcodeSupportedFormats.RSS_EXPANDED,
+          Html5QrcodeSupportedFormats.PDF_417,
+          Html5QrcodeSupportedFormats.DATA_MATRIX,
+          Html5QrcodeSupportedFormats.AZTEC,
         ],
       }
 
       const scanner = new Html5QrcodeScanner(elementId, config, false)
 
       scanner.render(
-        (decodedText) => {
-          const result: ScanResult = {
+        (decodedText, result) => {
+          const scanResult: ScanResult = {
             text: decodedText,
-            format: 'UNKNOWN',
+            format: result.result.format?.formatName || 'UNKNOWN',
             timestamp: new Date(),
           }
-          setScanResult(result)
-          onScanSuccess?.(result)
+          setScanResult(scanResult)
+          onScanSuccess?.(scanResult)
         },
-        (errorMessage) => {
-          if (!error) {
-            setError(null)
-          }
-        }
+        () => {}
       )
 
       scannerRef.current = scanner
@@ -78,7 +74,7 @@ export const useBarcodeScannerEngine = (
       setError(errorMsg)
       setIsScanning(false)
     }
-  }, [elementId, isScanning, error, onScanSuccess])
+  }, [elementId, isScanning, onScanSuccess])
 
   const stopScanning = useCallback(async () => {
     if (!isScanning || !scannerRef.current) return
@@ -96,7 +92,7 @@ export const useBarcodeScannerEngine = (
   useEffect(() => {
     return () => {
       if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error)
+        scannerRef.current.clear().catch(() => {})
       }
     }
   }, [])

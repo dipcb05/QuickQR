@@ -26,7 +26,6 @@ function getTypeInfo(type: QRType) {
   return QR_TYPES.find((t) => t.value === type) || QR_TYPES[0]
 }
 
-/** Render QR to a canvas with generous white padding + optional label text for beautification */
 function renderQRToCanvas(
   svgElement: SVGSVGElement,
   labelText?: string
@@ -170,7 +169,6 @@ export function CreateTab() {
     }
   }, [findSVG])
 
-  /** Copy QR as IMAGE to clipboard */
   const handleCopyImage = useCallback(async (qrContent: string, labelText?: string) => {
     const svg = findSVG(qrContent)
     if (!svg) {
@@ -206,13 +204,11 @@ export function CreateTab() {
     }
   }, [findSVG])
 
-  /** Build the deep link URL for a slug */
   const getDeepLink = useCallback((slug: string) => {
     const origin = typeof window !== 'undefined' ? window.location.origin : ''
     return `${origin}/qr/${slug}`
   }, [])
 
-  /** Copy deep link to clipboard */
   const handleCopyLink = useCallback((slug: string) => {
     const link = getDeepLink(slug)
     navigator.clipboard.writeText(link)
@@ -221,7 +217,6 @@ export function CreateTab() {
     setTimeout(() => setCopiedLink(false), 2000)
   }, [getDeepLink])
 
-  /** Share via Web Share API or fallback */
   const handleShare = useCallback(async (slug: string, displayName: string) => {
     const link = getDeepLink(slug)
     if (navigator.share) {
@@ -231,8 +226,7 @@ export function CreateTab() {
           text: `Check out this QR code: ${displayName}`,
           url: link,
         })
-      } catch {
-      }
+      } catch { }
     } else {
       navigator.clipboard.writeText(link)
       toast.success('Share link copied!')
@@ -517,7 +511,6 @@ export function CreateTab() {
                   <button
                     onClick={() => handleCopyLink(activeQR.slug)}
                     className="shrink-0 p-1 rounded-lg hover:bg-primary/10 text-primary transition-all"
-                    title="Copy share link"
                   >
                     {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
@@ -629,28 +622,24 @@ export function CreateTab() {
                         <button
                           onClick={() => setActiveQR({ content: item.content, type: item.type || 'text', label: item.label || item.content, slug: item.slug, customName: item.customName || '' })}
                           className="p-2 rounded-xl text-primary hover:bg-primary/10 transition-all"
-                          title="Preview"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleCopyImage(item.content, item.customName || item.label)}
                           className="p-2 rounded-xl text-muted-foreground hover:bg-secondary transition-all"
-                          title="Copy QR image"
                         >
                           <Copy className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDownload(item.content, item.customName || item.label)}
                           className="p-2 rounded-xl text-muted-foreground hover:bg-secondary transition-all"
-                          title="Download QR"
                         >
                           <Download className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => deleteFromHistory(item.id)}
                           className="p-2 rounded-xl text-destructive hover:bg-destructive/10 transition-all"
-                          title="Delete"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>

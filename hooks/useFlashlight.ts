@@ -19,7 +19,7 @@ export const useFlashlight = (streamRef: React.RefObject<MediaStream | null>): U
       const videoTrack = stream.getVideoTracks()[0]
       if (!videoTrack) return
 
-      const capabilities = (videoTrack.getCapabilities?.() || {}) as any
+      const capabilities = (videoTrack.getCapabilities?.() || {}) as Record<string, any>
       if (!capabilities.torch) {
         setIsSupported(false)
         return
@@ -29,13 +29,12 @@ export const useFlashlight = (streamRef: React.RefObject<MediaStream | null>): U
       const newState = !isFlashlightOn
 
       await videoTrack.applyConstraints({
-        advanced: [{ torch: newState }] as any,
+        advanced: [{ torch: newState } as any],
       })
 
       trackRef.current = videoTrack
       setIsFlashlightOn(newState)
-    } catch (err) {
-      console.error('Flashlight toggle failed:', err)
+    } catch {
       setIsFlashlightOn(false)
     }
   }, [streamRef, isFlashlightOn])

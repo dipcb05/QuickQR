@@ -1,9 +1,4 @@
-/**
- * Quick QR Service Worker - Optimised for Offline Use and Rapid Loading
- * Version: 20260404075359
- */
-
-const CACHE_NAME = 'quickqr-cache-20260404075359'
+const CACHE_NAME = 'quickqr-cache-20260404084504'
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -16,10 +11,7 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Pre-caching strategy assets')
-      return cache.addAll(ASSETS_TO_CACHE).catch((err) => {
-        console.warn('[SW] Cache addAll failed:', err)
-      })
+      return cache.addAll(ASSETS_TO_CACHE).catch(() => {})
     })
   )
   self.skipWaiting()
@@ -31,7 +23,6 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME && cacheName.startsWith('quickqr-')) {
-            console.log('[SW] Deleting old cache:', cacheName)
             return caches.delete(cacheName)
           }
         })

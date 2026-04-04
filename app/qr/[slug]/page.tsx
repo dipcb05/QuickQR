@@ -33,8 +33,7 @@ export default function QRViewerPage() {
   const [qrItem, setQrItem] = useState<CreatedQRItem | null | undefined>(undefined)
 
   useEffect(() => {
-    const item = getQRBySlug(slug)
-    setQrItem(item)
+    setQrItem(getQRBySlug(slug))
   }, [slug])
 
   const handleDownload = () => {
@@ -138,6 +137,7 @@ export default function QRViewerPage() {
       </div>
     )
   }
+
   const typeColor = TYPE_COLORS[qrItem.type] || TYPE_COLORS.text
   const typeLabel = TYPE_LABELS[qrItem.type] || 'Text'
   const displayName = qrItem.customName || qrItem.label

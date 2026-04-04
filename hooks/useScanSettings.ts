@@ -35,9 +35,7 @@ export const useScanSettings = (): UseScanSettingsReturn => {
       if (stored) {
         setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(stored) })
       }
-    } catch (err) {
-      console.error('Failed to load settings:', err)
-    }
+    } catch { }
     setIsMounted(true)
   }, [])
 
@@ -45,9 +43,7 @@ export const useScanSettings = (): UseScanSettingsReturn => {
     if (isMounted) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
-      } catch (err) {
-        console.error('Failed to save settings:', err)
-      }
+      } catch { }
     }
   }, [settings, isMounted])
 

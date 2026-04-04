@@ -30,9 +30,7 @@ export const useScanHistory = (): UseScanHistoryReturn => {
       if (stored) {
         setHistory(JSON.parse(stored))
       }
-    } catch (err) {
-      console.error('Failed to load history:', err)
-    }
+    } catch { }
     setIsMounted(true)
   }, [])
 
@@ -40,9 +38,7 @@ export const useScanHistory = (): UseScanHistoryReturn => {
     if (isMounted) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(history))
-      } catch (err) {
-        console.error('Failed to save history:', err)
-      }
+      } catch { }
     }
   }, [history, isMounted])
 
@@ -109,6 +105,7 @@ export const useScanHistory = (): UseScanHistoryReturn => {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }, [history])
 
   return {

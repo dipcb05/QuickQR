@@ -47,9 +47,7 @@ export const useCreateHistory = () => {
       if (stored) {
         setHistory(JSON.parse(stored))
       }
-    } catch (err) {
-      console.error('Failed to load created history:', err)
-    }
+    } catch { }
     setIsMounted(true)
   }, [])
 
@@ -57,9 +55,7 @@ export const useCreateHistory = () => {
     if (isMounted) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(history))
-      } catch (err) {
-        console.error('Failed to save created history:', err)
-      }
+      } catch { }
     }
   }, [history, isMounted])
 
