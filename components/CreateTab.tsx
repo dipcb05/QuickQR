@@ -48,14 +48,11 @@ function renderQRToCanvas(
       const ctx = canvas.getContext('2d')
       if (!ctx) return reject(new Error('Canvas context failed'))
 
-      // White background with rounded feel
       ctx.fillStyle = '#ffffff'
       ctx.fillRect(0, 0, totalWidth, totalHeight)
 
-      // Draw QR code centered
       ctx.drawImage(img, padding, padding, qrSize, qrSize)
 
-      // Draw label if present
       if (labelText) {
         const fontSize = Math.max(16, Math.round(qrSize * 0.04))
         ctx.fillStyle = '#666666'
@@ -67,7 +64,6 @@ function renderQRToCanvas(
         ctx.fillText(displayLabel, totalWidth / 2, qrSize + padding + labelHeight / 2, maxWidth)
       }
 
-      // Subtle bottom branding
       const brandSize = Math.max(10, Math.round(qrSize * 0.025))
       ctx.fillStyle = '#cccccc'
       ctx.font = `500 ${brandSize}px system-ui, -apple-system, sans-serif`
@@ -83,8 +79,6 @@ function renderQRToCanvas(
 
 export function CreateTab() {
   const [selectedType, setSelectedType] = useState<QRType>('text')
-
-  // Form fields
   const [customName, setCustomName] = useState('')
   const [textContent, setTextContent] = useState('')
   const [urlContent, setUrlContent] = useState('')
@@ -198,7 +192,6 @@ export function CreateTab() {
             icon: <Image className="w-4 h-4" />,
           })
         } catch {
-          // Fallback: download instead
           const url = URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url
@@ -239,7 +232,6 @@ export function CreateTab() {
           url: link,
         })
       } catch {
-        // User cancelled
       }
     } else {
       navigator.clipboard.writeText(link)
@@ -253,7 +245,6 @@ export function CreateTab() {
 
   return (
     <div className="w-full h-full flex flex-col bg-background">
-      {/* Header */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border/50 px-4 pt-4 pb-3">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-foreground">Create QR</h1>
@@ -262,7 +253,6 @@ export function CreateTab() {
           </span>
         </div>
 
-        {/* Type Selector Pills */}
         <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
           {QR_TYPES.map((type) => {
             const isActive = selectedType === type.value
@@ -270,11 +260,10 @@ export function CreateTab() {
               <button
                 key={type.value}
                 onClick={() => { setSelectedType(type.value); setActiveQR(null) }}
-                className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 ${
-                  isActive
-                    ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-[1.02]'
-                    : 'bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground'
-                }`}
+                className={`relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 shrink-0 ${isActive
+                  ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-[1.02]'
+                  : 'bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground'
+                  }`}
               >
                 <type.icon className="w-3.5 h-3.5" />
                 {type.label}
@@ -285,7 +274,6 @@ export function CreateTab() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-5 pb-24">
-        {/* Dynamic Form */}
         <motion.div
           key={selectedType}
           initial={{ opacity: 0, y: 8 }}
@@ -293,7 +281,6 @@ export function CreateTab() {
           transition={{ duration: 0.2 }}
           className="space-y-3"
         >
-          {/* Label / Name field (universal) */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
               <Tag className="w-3 h-3" /> Label (optional)
@@ -372,11 +359,10 @@ export function CreateTab() {
                   <button
                     key={enc}
                     onClick={() => setWifiEncryption(enc)}
-                    className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
-                      wifiEncryption === enc
-                        ? 'bg-primary text-primary-foreground shadow-md'
-                        : 'bg-secondary/50 text-muted-foreground hover:bg-secondary'
-                    }`}
+                    className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${wifiEncryption === enc
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : 'bg-secondary/50 text-muted-foreground hover:bg-secondary'
+                      }`}
                   >
                     {enc === 'nopass' ? 'Open' : enc}
                   </button>
@@ -474,7 +460,6 @@ export function CreateTab() {
             </div>
           )}
 
-          {/* Generate Button */}
           <Button
             onClick={handleCreate}
             className={`w-full h-12 rounded-2xl text-sm font-bold bg-gradient-to-r ${currentTypeInfo.color} text-white border-0 shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all duration-200`}
@@ -484,7 +469,6 @@ export function CreateTab() {
           </Button>
         </motion.div>
 
-        {/* Active QR Preview */}
         <AnimatePresence mode="wait">
           {activeQR && (
             <motion.div
@@ -495,7 +479,6 @@ export function CreateTab() {
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
               className="relative flex flex-col items-center gap-5 py-8 px-4 bg-gradient-to-b from-card/60 to-card/20 border border-border/50 rounded-3xl backdrop-blur-sm"
             >
-              {/* Close button */}
               <button
                 onClick={() => setActiveQR(null)}
                 className="absolute top-3 right-3 p-1.5 rounded-full bg-secondary/60 text-muted-foreground hover:text-foreground hover:bg-secondary transition-all"
@@ -503,18 +486,14 @@ export function CreateTab() {
                 <X className="w-4 h-4" />
               </button>
 
-              {/* Custom name */}
               {activeQR.customName && (
                 <h3 className="text-lg font-bold text-foreground text-center px-8">{activeQR.customName}</h3>
               )}
-
-              {/* Type badge */}
               <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r ${getTypeInfo(activeQR.type).color} text-white text-xs font-bold shadow-md`}>
                 {React.createElement(getTypeInfo(activeQR.type).icon, { className: 'w-3 h-3' })}
                 {getTypeInfo(activeQR.type).label}
               </div>
 
-              {/* QR Code */}
               <div ref={qrRef} className="p-5 bg-white rounded-3xl shadow-2xl shadow-black/10 dark:shadow-black/30">
                 <QRCodeSVG
                   id="qr-active-preview"
@@ -526,12 +505,9 @@ export function CreateTab() {
                 />
               </div>
 
-              {/* Content preview */}
               <p className="text-xs text-muted-foreground text-center max-w-[260px] break-all font-mono leading-relaxed bg-secondary/30 px-3 py-2 rounded-xl">
                 {activeQR.label.length > 80 ? activeQR.label.slice(0, 80) + '...' : activeQR.label}
               </p>
-
-              {/* Deep link URL */}
               {activeQR.slug && (
                 <div className="flex items-center gap-2 bg-secondary/40 rounded-xl px-3 py-2 max-w-full">
                   <Link2 className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -548,7 +524,6 @@ export function CreateTab() {
                 </div>
               )}
 
-              {/* Action buttons */}
               <div className="flex gap-2 flex-wrap justify-center">
                 <Button
                   onClick={() => handleDownload(activeQR.content, activeQR.customName || activeQR.label)}
@@ -576,7 +551,6 @@ export function CreateTab() {
           )}
         </AnimatePresence>
 
-        {/* History List */}
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-xs font-bold text-muted-foreground uppercase tracking-wider opacity-60">
@@ -621,7 +595,6 @@ export function CreateTab() {
                       transition={{ delay: index * 0.02 }}
                       className="group relative flex items-center gap-3 p-3 bg-card/30 border border-border/40 rounded-2xl backdrop-blur-sm hover:bg-card/50 hover:border-border/60 transition-all duration-200"
                     >
-                      {/* QR Thumbnail */}
                       <div className="relative shrink-0">
                         <div className="p-1.5 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
                           <QRCodeSVG
@@ -631,13 +604,10 @@ export function CreateTab() {
                             level="M"
                           />
                         </div>
-                        {/* Type indicator dot */}
                         <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-r ${typeInfo.color} flex items-center justify-center shadow-sm`}>
                           <TypeIcon className="w-2.5 h-2.5 text-white" />
                         </div>
                       </div>
-
-                      {/* Content */}
                       <div className="flex-1 min-w-0 pr-20">
                         <p className="text-sm font-semibold text-foreground truncate">{displayName}</p>
                         <div className="flex items-center gap-2 mt-0.5">
@@ -655,7 +625,6 @@ export function CreateTab() {
                         </div>
                       </div>
 
-                      {/* Actions */}
                       <div className="absolute right-2 flex gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all">
                         <button
                           onClick={() => setActiveQR({ content: item.content, type: item.type || 'text', label: item.label || item.content, slug: item.slug, customName: item.customName || '' })}

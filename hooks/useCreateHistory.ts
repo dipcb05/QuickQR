@@ -25,7 +25,6 @@ function generateSlug(name: string): string {
   return base ? `${base}-${suffix}` : suffix
 }
 
-// Static helper to read from localStorage directly (for server-side / other components)
 export function getQRBySlug(slug: string): CreatedQRItem | null {
   if (typeof window === 'undefined') return null
   try {
@@ -78,9 +77,8 @@ export const useCreateHistory = () => {
       type,
       timestamp: new Date().toISOString(),
     }
-    
+
     setHistory((prev) => {
-      // Avoid duplicate entries if same content created consecutively
       if (prev.length > 0 && prev[0].content === content) {
         return prev
       }
@@ -103,12 +101,12 @@ export const useCreateHistory = () => {
     localStorage.removeItem(STORAGE_KEY)
   }, [])
 
-  return { 
-    history, 
-    addToHistory, 
+  return {
+    history,
+    addToHistory,
     findBySlug,
-    deleteFromHistory, 
+    deleteFromHistory,
     clearHistory,
-    isMounted 
+    isMounted
   }
 }

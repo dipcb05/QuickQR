@@ -8,7 +8,6 @@ export default function Loading() {
   return (
     <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background">
       <div className="relative">
-        {/* Animated logo/icon */}
         <motion.div
           animate={{ scale: [1, 1.1, 1], rotate: [0, 90, 180, 270, 360] }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -17,7 +16,6 @@ export default function Loading() {
           <Scan className="w-8 h-8 text-primary-foreground" />
         </motion.div>
 
-        {/* Pulse Ring */}
         <motion.div
           animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
           transition={{ duration: 1, repeat: Infinity }}
@@ -25,7 +23,6 @@ export default function Loading() {
         />
       </div>
 
-      {/* Loading Text */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -54,7 +51,6 @@ export default function Loading() {
         </div>
       </motion.div>
 
-      {/* Background Ambience */}
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-primary/5 to-transparent pointer-events-none" />
     </div>
   )

@@ -102,7 +102,6 @@ export function ScanResultModal({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-6">
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -111,7 +110,6 @@ export function ScanResultModal({
             className="absolute inset-0 bg-black/70 backdrop-blur-md"
           />
 
-          {/* Modal Container */}
           <motion.div
             initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -119,13 +117,11 @@ export function ScanResultModal({
             transition={{ type: 'spring', damping: 30, stiffness: 350 }}
             className="relative w-full max-w-lg bg-card border border-border/50 sm:rounded-[32px] rounded-t-[32px] overflow-hidden shadow-2xl pb-10 sm:pb-8 h-auto max-h-[90vh] overflow-y-auto"
           >
-            {/* Grab Bar for mobile */}
             <div className="w-full flex justify-center py-4 sm:hidden">
               <div className="w-12 h-1.5 bg-muted rounded-full" />
             </div>
 
             <div className="px-6 space-y-6 pt-2">
-              {/* Header */}
               <div className="flex items-start justify-between">
                 <div className="space-y-2">
                   <h2 className="text-2xl font-bold tracking-tight">
@@ -147,7 +143,6 @@ export function ScanResultModal({
                 </Button>
               </div>
 
-              {/* Result Code Display */}
               <div className="relative group">
                 <div className="absolute inset-0 bg-primary/5 blur-2xl group-hover:bg-primary/10 transition-colors rounded-3xl" />
                 <div className="relative bg-secondary/30 border border-primary/10 rounded-3xl p-6 shadow-inner space-y-4">
@@ -192,7 +187,6 @@ export function ScanResultModal({
                 </div>
               </div>
 
-              {/* Action Grid */}
               <div className="grid grid-cols-2 gap-3">
                 <Button onClick={onCopy} variant="outline" className={`h-16 rounded-2xl gap-3 text-sm font-bold border-border/40 hover:bg-primary/5 transition-all active:scale-95 ${isCopied ? 'text-green-500 border-green-500/30' : ''}`}>
                   {isCopied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5 opacity-70" />}

@@ -52,19 +52,15 @@ export function SettingsTab({
 
   return (
     <div className="w-full h-full flex flex-col bg-background overflow-y-scroll">
-      {/* Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-md border-b border-border p-4">
         <h1 className="text-2xl font-bold text-foreground">Settings</h1>
       </div>
-
-      {/* Content */}
       <motion.div
         variants={container}
         initial="hidden"
         animate="show"
         className="flex-1 p-4 space-y-4 pb-24"
       >
-        {/* Sound Settings */}
         <motion.div
           variants={item}
           className="bg-card/50 border border-border rounded-xl p-4 backdrop-blur-sm"
@@ -89,7 +85,6 @@ export function SettingsTab({
           </div>
         </motion.div>
 
-        {/* Vibration Settings */}
         <motion.div
           variants={item}
           className="bg-card/50 border border-border rounded-xl p-4 backdrop-blur-sm"
@@ -116,7 +111,6 @@ export function SettingsTab({
           </div>
         </motion.div>
 
-        {/* Auto-Copy Settings */}
         <motion.div
           variants={item}
           className="bg-card/50 border border-border rounded-xl p-4 backdrop-blur-sm"
@@ -141,7 +135,6 @@ export function SettingsTab({
           </div>
         </motion.div>
 
-        {/* Continuous Scan Mode */}
         <motion.div
           variants={item}
           className="bg-card/50 border border-border rounded-xl p-4 backdrop-blur-sm"
@@ -166,7 +159,6 @@ export function SettingsTab({
           </div>
         </motion.div>
 
-        {/* Local Storage Connection */}
         <motion.div
           variants={item}
           className="bg-card/50 border border-border rounded-xl p-4 backdrop-blur-sm"
@@ -196,7 +188,6 @@ export function SettingsTab({
           </div>
         </motion.div>
 
-        {/* Reset Settings */}
         <motion.div
           variants={item}
           className="bg-card/50 border border-border rounded-xl p-4 backdrop-blur-sm"
@@ -222,7 +213,6 @@ export function SettingsTab({
           </div>
         </motion.div>
 
-        {/* Install PWA */}
         {isInstallable && (
           <motion.div
             variants={item}
@@ -251,7 +241,6 @@ export function SettingsTab({
           </motion.div>
         )}
 
-        {/* Buy Me a Coffee */}
         <motion.div
           variants={item}
           className="bg-gradient-to-r from-[#FFDD00]/10 to-[#FF813F]/10 border border-[#FFDD00]/20 rounded-xl p-4 backdrop-blur-sm"
@@ -281,7 +270,6 @@ export function SettingsTab({
           </div>
         </motion.div>
 
-        {/* Support Email */}
         <motion.div
           variants={item}
           className="bg-card/50 border border-border rounded-xl p-4 backdrop-blur-sm"
@@ -308,7 +296,6 @@ export function SettingsTab({
           </div>
         </motion.div>
 
-        {/* App Info */}
         <motion.div
           variants={item}
           className="bg-card/50 border border-border rounded-xl p-4 backdrop-blur-sm mt-auto pb-4"

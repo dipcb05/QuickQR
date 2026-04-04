@@ -88,7 +88,6 @@ export default function QRViewerPage() {
     img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)))
   }
 
-  // Loading state
   if (qrItem === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -106,7 +105,6 @@ export default function QRViewerPage() {
     )
   }
 
-  // Not found state
   if (qrItem === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -140,8 +138,6 @@ export default function QRViewerPage() {
       </div>
     )
   }
-
-  // Found — display the QR
   const typeColor = TYPE_COLORS[qrItem.type] || TYPE_COLORS.text
   const typeLabel = TYPE_LABELS[qrItem.type] || 'Text'
   const displayName = qrItem.customName || qrItem.label
@@ -154,27 +150,21 @@ export default function QRViewerPage() {
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         className="flex flex-col items-center gap-6 max-w-md w-full"
       >
-        {/* App branding */}
         <div className="flex items-center gap-2 text-muted-foreground/50">
           <QrCode className="w-4 h-4" />
           <span className="text-xs font-bold tracking-wider uppercase">Quick QR</span>
         </div>
 
-        {/* QR Card */}
         <div className="w-full bg-gradient-to-b from-card/80 to-card/30 border border-border/50 rounded-3xl backdrop-blur-sm p-6 flex flex-col items-center gap-5">
-          {/* Custom name */}
           {displayName && (
             <h1 className="text-xl font-bold text-foreground text-center break-words">
               {displayName}
             </h1>
           )}
 
-          {/* Type badge */}
           <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r ${typeColor} text-white text-xs font-bold shadow-md`}>
             {typeLabel}
           </div>
-
-          {/* QR Code */}
           <div className="p-6 bg-white rounded-3xl shadow-2xl shadow-black/10 dark:shadow-black/30">
             <QRCodeSVG
               id="qr-viewer-svg"
@@ -186,14 +176,12 @@ export default function QRViewerPage() {
             />
           </div>
 
-          {/* Created date */}
           <p className="text-[11px] text-muted-foreground/50 font-medium">
             Created {new Date(qrItem.timestamp).toLocaleDateString(undefined, {
               year: 'numeric', month: 'long', day: 'numeric',
             })}
           </p>
 
-          {/* Download button */}
           <Button
             onClick={handleDownload}
             className={`w-full max-w-xs h-12 rounded-2xl text-sm font-bold bg-gradient-to-r ${typeColor} text-white border-0 shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all duration-200`}
@@ -202,7 +190,6 @@ export default function QRViewerPage() {
           </Button>
         </div>
 
-        {/* Footer link */}
         <Link href="/create" className="text-xs text-primary hover:underline font-medium">
           Create your own QR code →
         </Link>

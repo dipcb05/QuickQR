@@ -18,7 +18,6 @@ export function SplashScreen({ onStartClick, isInstallable, onInstall }: SplashS
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center p-8 overflow-hidden"
     >
-      {/* Background Decorative Elements - Simplified for Performance */}
       <motion.div
         className="absolute w-96 h-96 bg-primary/5 rounded-full -top-20 -left-20"
         initial={{ opacity: 0.5 }}
@@ -28,9 +27,7 @@ export function SplashScreen({ onStartClick, isInstallable, onInstall }: SplashS
         initial={{ opacity: 0.5 }}
       />
 
-      {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center text-center gap-12 max-w-sm">
-        {/* Animated App Icon */}
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -51,7 +48,6 @@ export function SplashScreen({ onStartClick, isInstallable, onInstall }: SplashS
           </motion.div>
         </motion.div>
 
-        {/* Title and Tagline */}
         <div className="space-y-4">
           <motion.h1
             initial={{ y: 20, opacity: 0 }}
@@ -71,7 +67,6 @@ export function SplashScreen({ onStartClick, isInstallable, onInstall }: SplashS
           </motion.p>
         </div>
 
-        {/* Action Button */}
         <motion.div
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -93,7 +88,6 @@ export function SplashScreen({ onStartClick, isInstallable, onInstall }: SplashS
           </Button>
         </motion.div>
 
-        {/* Install Button */}
         {isInstallable && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -110,7 +104,6 @@ export function SplashScreen({ onStartClick, isInstallable, onInstall }: SplashS
           </motion.div>
         )}
 
-        {/* Optional: Small footer info */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

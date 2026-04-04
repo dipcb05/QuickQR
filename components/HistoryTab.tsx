@@ -90,7 +90,6 @@ export function HistoryTab({
 
   return (
     <div className="w-full h-full flex flex-col bg-background">
-      {/* Header */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground">Scan History</h1>
@@ -142,7 +141,6 @@ export function HistoryTab({
           </div>
         </div>
 
-        {/* Search Bar */}
         <div className="relative">
           <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -155,7 +153,6 @@ export function HistoryTab({
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 overflow-y-auto">
         {filteredHistory.length === 0 ? (
           <div className="flex items-center justify-center h-full">
@@ -193,7 +190,6 @@ export function HistoryTab({
         )}
       </div>
 
-      {/* Individual Delete Confirmation Modal */}
       <AlertDialog open={itemToDelete !== null} onOpenChange={(open) => !open && setItemToDelete(null)}>
         <AlertDialogContent className="rounded-[2rem] max-w-[320px]">
           <AlertDialogHeader className="items-center text-center">
@@ -222,7 +218,6 @@ export function HistoryTab({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Clear All Confirmation Modal */}
       <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <AlertDialogContent className="rounded-[2rem] max-w-[320px]">
           <AlertDialogHeader className="items-center text-center">
@@ -249,7 +244,6 @@ export function HistoryTab({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Export Date Range Modal */}
       <Dialog open={isExportModalOpen} onOpenChange={setIsExportModalOpen}>
         <DialogContent className="max-w-sm rounded-[2rem]">
           <DialogHeader>
@@ -305,16 +299,16 @@ export function HistoryTab({
   )
 }
 
-const HistoryItemCard = memo(({ 
-  item, 
-  onShare, 
-  onCopy, 
-  onDelete 
-}: { 
-  item: HistoryItem, 
-  onShare: (t: string, f: string) => void, 
-  onCopy: (t: string, id: string) => void, 
-  onDelete: (id: string) => void 
+const HistoryItemCard = memo(({
+  item,
+  onShare,
+  onCopy,
+  onDelete
+}: {
+  item: HistoryItem,
+  onShare: (t: string, f: string) => void,
+  onCopy: (t: string, id: string) => void,
+  onDelete: (id: string) => void
 }) => {
   const itemAnim = {
     hidden: { opacity: 0, y: 20 },
