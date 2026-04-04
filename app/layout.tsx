@@ -85,24 +85,26 @@ export default function RootLayout({
           </div>
           <Toaster closeButton richColors position="top-center" />
           <Analytics />
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                if ('serviceWorker' in navigator) {
-                  window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('/sw.js').then(
-                      function(registration) {
-                        console.log('[SW] Registered successfully');
-                      },
-                      function(err) {
-                        console.error('[SW] Registration failed: ', err);
-                      }
-                    );
-                  });
-                }
-              `
-            }}
-          />
+          {process.env.NODE_ENV === 'production' && (
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', function() {
+                      navigator.serviceWorker.register('/sw.js').then(
+                        function(registration) {
+                          console.log('[SW] Registered successfully');
+                        },
+                        function(err) {
+                          console.error('[SW] Registration failed: ', err);
+                        }
+                      );
+                    });
+                  }
+                `
+              }}
+            />
+          )}
         </ThemeProvider>
       </body>
     </html>

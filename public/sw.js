@@ -1,9 +1,9 @@
 /**
  * Quick QR Service Worker - Optimised for Offline Use and Rapid Loading
- * Version: 20260404070556
+ * Version: 20260404075359
  */
 
-const CACHE_NAME = 'quickqr-cache-20260404070556'
+const CACHE_NAME = 'quickqr-cache-20260404075359'
 const ASSETS_TO_CACHE = [
   '/',
   '/manifest.json',
@@ -47,9 +47,10 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || !request.url.startsWith('http')) return
 
   const isStaticAsset = ASSETS_TO_CACHE.some(asset => request.url.endsWith(asset)) ||
-    request.url.includes('/_next/static/') ||
     request.url.includes('.png') ||
-    request.url.includes('.jpg')
+    request.url.includes('.jpg') ||
+    request.url.includes('.svg') ||
+    request.url.includes('.ico')
 
   if (isStaticAsset) {
     event.respondWith(

@@ -140,6 +140,9 @@ importers:
       pwa-asset-generator:
         specifier: ^8.1.4
         version: 8.1.4
+      qrcode.react:
+        specifier: ^4.2.0
+        version: 4.2.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -2085,6 +2088,11 @@ packages:
     resolution: {integrity: sha512-+Inf9aSVuH7MErgkCSZ1xwBdmK1p9Qhhvqt9JVv7MbaF2C7FfYDN+2dzNa4CNGGVNcf9UJP8MWAxHUEJBRF6yQ==}
     engines: {node: '>=18'}
     hasBin: true
+
+  qrcode.react@4.2.0:
+    resolution: {integrity: sha512-QpgqWi8rD9DsS9EP3z7BT+5lY5SFhsqGjpgW5DY/i3mK4M9DTBNz3ErMi8BWYEfI3L0d8GIbGmcdFAS1uIRGjA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-day-picker@9.14.0:
     resolution: {integrity: sha512-tBaoDWjPwe0M5pGrum4H0SR6Lyk+BO9oHnp9JbKpGKW2mlraNPgP9BMfsg5pWpwrssARmeqk7YBl2oXutZTaHA==}
@@ -4236,6 +4244,10 @@ snapshots:
       - react-native-b4a
       - supports-color
       - utf-8-validate
+
+  qrcode.react@4.2.0(react@19.2.4):
+    dependencies:
+      react: 19.2.4
 
   react-day-picker@9.14.0(react@19.2.4):
     dependencies:

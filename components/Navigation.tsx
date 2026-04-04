@@ -3,14 +3,15 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import { Scan, History, Settings as SettingsIcon } from 'lucide-react'
+import { Scan, PlusCircle, History, Settings as SettingsIcon } from 'lucide-react'
 
 export function Navigation() {
   const pathname = usePathname()
-  if (pathname === '/') return null
+  if (pathname === '/' || pathname.startsWith('/qr/')) return null
 
   const navItems = [
     { label: 'Scan', icon: Scan, path: '/scan' },
+    { label: 'Create', icon: PlusCircle, path: '/create' },
     { label: 'History', icon: History, path: '/history' },
     { label: 'Settings', icon: SettingsIcon, path: '/settings' },
   ]
