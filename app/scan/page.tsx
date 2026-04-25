@@ -12,6 +12,7 @@ import { useScanHistory } from '@/hooks/useScanHistory'
 import { useScanSettings } from '@/hooks/useScanSettings'
 import { useFolderStorage } from '@/hooks/useFolderStorage'
 import { ScanResult } from '@/hooks/useBarcodeScannerEngine'
+import { getWebLinkInfo } from '@/lib/scan-result'
 import { toast } from 'sonner'
 
 const CameraScanner = dynamic(() => import('@/components/CameraScanner').then(mod => mod.CameraScanner), {
@@ -41,7 +42,6 @@ export default function ScanPage() {
   useEffect(() => {
     let mounted = true
     const init = async () => {
-      await new Promise(r => setTimeout(r, 100))
       if (!mounted) return
       try {
         await startCamera()
@@ -78,6 +78,8 @@ export default function ScanPage() {
   }, [cameraVideoRef])
 
   const handleScanSuccess = useCallback(async (result: ScanResult) => {
+    const webLink = getWebLinkInfo(result.text)
+
     if (settings.vibrationEnabled) vibrate(100)
     if (settings.soundEnabled) {
       const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2216/2216-preview.mp3')
@@ -91,23 +93,25 @@ export default function ScanPage() {
 
     if (!settings.continuousScan) {
       pauseCamera()
-      setCurrentScan(result)
+      setCurrentScan(webLink ? { ...result, text: webLink.normalized } : result)
       setIsResultModalOpen(true)
     }
 
     const imageBlob = captureFrame() || null
     const timestamp = new Date().toISOString()
     const historyId = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+    const historyText = webLink ? webLink.normalized : result.text
 
-    addToHistory({ text: result.text, format: result.format, timestamp })
+    addToHistory({ text: historyText, format: result.format, timestamp })
 
     if (isFolderConnected) {
       const saved = await saveScanToFolder({
-        id: historyId, text: result.text, format: result.format, timestamp, imageBlob
+        id: historyId, text: historyText, format: result.format, timestamp, imageBlob
       })
       if (saved) toast.success('Saved to /Scans folder', { id: 'folder-save' })
     } else if (settings.continuousScan) {
-      toast.success(`Scanned: ${result.text.slice(0, 30)}...`, { id: `scan-${historyId}`, duration: 2000 })
+      const feedbackText = historyText.length > 30 ? `${historyText.slice(0, 30)}...` : historyText
+      toast.success(`Scanned: ${feedbackText}`, { id: `scan-${historyId}`, duration: 2000 })
     }
   }, [settings, vibrate, pauseCamera, captureFrame, addToHistory, isFolderConnected, saveScanToFolder])
 

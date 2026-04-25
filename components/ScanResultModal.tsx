@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Copy, Search, Share2, X, Check, Clock, Tag, History, Loader2, ArrowRight, Zap } from 'lucide-react'
+import { Copy, Search, Share2, X, Check, Clock, Tag, History, Loader2, ArrowRight, Zap, Globe } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { getWebLinkInfo } from '@/lib/scan-result'
 
 interface ScanResultModalProps {
   isOpen: boolean
@@ -30,6 +31,7 @@ export function ScanResultModal({
 }: ScanResultModalProps) {
   const [isSharing, setIsSharing] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
+  const [isOpeningLink, setIsOpeningLink] = useState(false)
   const router = useRouter()
 
   const handleShare = async () => {
@@ -91,11 +93,23 @@ export function ScanResultModal({
   }
 
   const wifiInfo = result ? parseWifi(result.text) : null
+  const webLink = result ? getWebLinkInfo(result.text) : null
 
   const handleConnectWifi = () => {
     if (!result) return
     window.location.href = result.text
     toast.success('Attempting to connect to ' + wifiInfo?.ssid)
+  }
+
+  const handleOpenLink = async () => {
+    if (!webLink) return
+    setIsOpeningLink(true)
+
+    try {
+      window.open(webLink.normalized, '_blank', 'noopener,noreferrer')
+    } finally {
+      setIsOpeningLink(false)
+    }
   }
 
   return (
@@ -177,6 +191,21 @@ export function ScanResultModal({
                       >
                         <Zap className="w-5 h-5" />
                         Connect to WiFi
+                      </Button>
+                    </div>
+                  ) : webLink ? (
+                    <div className="space-y-4 w-full">
+                      <div className="bg-background/40 p-4 rounded-2xl space-y-1">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Detected Web Link</p>
+                        <p className="text-lg font-mono text-foreground break-all">{webLink.label}</p>
+                      </div>
+                      <Button
+                        onClick={handleOpenLink}
+                        disabled={isOpeningLink}
+                        className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl gap-2 font-bold shadow-lg shadow-blue-500/20"
+                      >
+                        {isOpeningLink ? <Loader2 className="w-5 h-5 animate-spin" /> : <Globe className="w-5 h-5" />}
+                        Open Link
                       </Button>
                     </div>
                   ) : (

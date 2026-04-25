@@ -1,10 +1,10 @@
 const CACHE_NAME = 'quickqr-cache-20260404084504'
 const ASSETS_TO_CACHE = [
-  '/',
+  '/scan',
   '/manifest.json',
   '/icon-192x192.png',
   '/icon-512x512.png',
-  '/apple-icon-180x180.png',
+  '/apple-icon-180.png',
   '/offline.html'
 ]
 

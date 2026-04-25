@@ -56,7 +56,17 @@ export const viewport: Viewport = {
   userScalable: true,
 }
 
-const SW_REGISTER_SCRIPT = `if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js')})}`
+const SW_REGISTER_SCRIPT = `
+if ('serviceWorker' in navigator) {
+  const register = () => navigator.serviceWorker.register('/sw.js')
+  window.addEventListener('load', () => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(register, { timeout: 2000 })
+    } else {
+      setTimeout(register, 300)
+    }
+  })
+}`
 
 export default function RootLayout({
   children,
