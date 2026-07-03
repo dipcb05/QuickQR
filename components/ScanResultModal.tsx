@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from '@/components/ui/button'
-import { Copy, Search, Share2, X, Check, Clock, Tag, History, Loader2, ArrowRight, Zap, Globe } from 'lucide-react'
+import { Copy, Search, Share2, X, Check, Clock, Tag, History, Loader2, ArrowRight, Zap, ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { getWebLinkInfo } from '@/lib/scan-result'
+import { getScannableLinkInfo } from '@/lib/scan-result'
 
 interface ScanResultModalProps {
   isOpen: boolean
@@ -45,7 +45,7 @@ export function ScanResultModal({
         await navigator.share({
           title: 'Scanned QR Code',
           text: result.text,
-          url: result.text.startsWith('http') ? result.text : undefined
+          url: /^https?:\/\//i.test(result.text) ? result.text : undefined
         })
         toast.success('Shared successfully')
       } else {
@@ -93,7 +93,7 @@ export function ScanResultModal({
   }
 
   const wifiInfo = result ? parseWifi(result.text) : null
-  const webLink = result ? getWebLinkInfo(result.text) : null
+  const scannableLink = result ? getScannableLinkInfo(result.text) : null
 
   const handleConnectWifi = () => {
     if (!result) return
@@ -102,11 +102,11 @@ export function ScanResultModal({
   }
 
   const handleOpenLink = async () => {
-    if (!webLink) return
+    if (!scannableLink) return
     setIsOpeningLink(true)
 
     try {
-      window.open(webLink.normalized, '_blank', 'noopener,noreferrer')
+      window.location.href = scannableLink.normalized
     } finally {
       setIsOpeningLink(false)
     }
@@ -193,18 +193,18 @@ export function ScanResultModal({
                         Connect to WiFi
                       </Button>
                     </div>
-                  ) : webLink ? (
+                  ) : scannableLink ? (
                     <div className="space-y-4 w-full">
                       <div className="bg-background/40 p-4 rounded-2xl space-y-1">
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Detected Web Link</p>
-                        <p className="text-lg font-mono text-foreground break-all">{webLink.label}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Detected Link</p>
+                        <p className="text-lg font-mono text-foreground break-all">{scannableLink.label}</p>
                       </div>
                       <Button
                         onClick={handleOpenLink}
                         disabled={isOpeningLink}
                         className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl gap-2 font-bold shadow-lg shadow-blue-500/20"
                       >
-                        {isOpeningLink ? <Loader2 className="w-5 h-5 animate-spin" /> : <Globe className="w-5 h-5" />}
+                        {isOpeningLink ? <Loader2 className="w-5 h-5 animate-spin" /> : <ExternalLink className="w-5 h-5" />}
                         Open Link
                       </Button>
                     </div>

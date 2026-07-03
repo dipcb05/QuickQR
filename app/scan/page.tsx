@@ -12,7 +12,7 @@ import { useScanHistory } from '@/hooks/useScanHistory'
 import { useScanSettings } from '@/hooks/useScanSettings'
 import { useFolderStorage } from '@/hooks/useFolderStorage'
 import { ScanResult } from '@/hooks/useBarcodeScannerEngine'
-import { getWebLinkInfo } from '@/lib/scan-result'
+import { getScannableLinkInfo } from '@/lib/scan-result'
 import { toast } from 'sonner'
 
 const CameraScanner = dynamic(() => import('@/components/CameraScanner').then(mod => mod.CameraScanner), {
@@ -78,11 +78,11 @@ export default function ScanPage() {
   }, [cameraVideoRef])
 
   const handleScanSuccess = useCallback(async (result: ScanResult) => {
-    const webLink = getWebLinkInfo(result.text)
+    const scannableLink = getScannableLinkInfo(result.text)
 
     if (settings.vibrationEnabled) vibrate(100)
     if (settings.soundEnabled) {
-      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2216/2216-preview.mp3')
+      const audio = new Audio(settings.scanSoundUrl)
       audio.play().catch(() => {})
     }
 
@@ -93,14 +93,14 @@ export default function ScanPage() {
 
     if (!settings.continuousScan) {
       pauseCamera()
-      setCurrentScan(webLink ? { ...result, text: webLink.normalized } : result)
+      setCurrentScan(scannableLink ? { ...result, text: scannableLink.normalized } : result)
       setIsResultModalOpen(true)
     }
 
     const imageBlob = captureFrame() || null
     const timestamp = new Date().toISOString()
     const historyId = `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
-    const historyText = webLink ? webLink.normalized : result.text
+    const historyText = scannableLink ? scannableLink.normalized : result.text
 
     addToHistory({ text: historyText, format: result.format, timestamp })
 

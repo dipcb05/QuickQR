@@ -1,12 +1,35 @@
-const CACHE_NAME = 'quickqr-cache-20260404084504'
+const CACHE_NAME = 'quickqr-cache-20260703214455'
+const APP_SHELL_ROUTES = ['/', '/scan', '/create', '/history', '/settings', '/offline.html']
 const ASSETS_TO_CACHE = [
-  '/scan',
+  ...APP_SHELL_ROUTES,
   '/manifest.json',
   '/icon-192x192.png',
   '/icon-512x512.png',
-  '/apple-icon-180.png',
-  '/offline.html'
+  '/apple-icon-180.png'
 ]
+
+const isSameOrigin = (request) => new URL(request.url).origin === self.location.origin
+
+const updateCache = async (request) => {
+  try {
+    const response = await fetch(request)
+    if (response && response.status === 200 && (response.type === 'basic' || response.type === 'default')) {
+      const cache = await caches.open(CACHE_NAME)
+      await cache.put(request, response.clone())
+    }
+    return response
+  } catch {
+    return null
+  }
+}
+
+const getCachedRouteFallback = async (request) => {
+  const url = new URL(request.url)
+  return (await caches.match(request)) ||
+    (await caches.match(url.pathname)) ||
+    (await caches.match('/scan')) ||
+    (await caches.match('/offline.html'))
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -35,29 +58,37 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event
 
-  if (request.method !== 'GET' || !request.url.startsWith('http')) return
+  if (request.method !== 'GET' || !request.url.startsWith('http') || !isSameOrigin(request)) return
 
-  const isStaticAsset = ASSETS_TO_CACHE.some(asset => request.url.endsWith(asset)) ||
-    request.url.includes('.png') ||
-    request.url.includes('.jpg') ||
-    request.url.includes('.svg') ||
-    request.url.includes('.ico')
+  if (request.mode === 'navigate') {
+    event.respondWith((async () => {
+      const cachedResponse = await caches.match(request)
+      const networkPromise = updateCache(request)
+      if (cachedResponse) return cachedResponse
+
+      const routeFallback = await getCachedRouteFallback(request)
+      if (routeFallback) return routeFallback
+
+      const networkResponse = await networkPromise
+      return networkResponse || Response.error()
+    })())
+    return
+  }
+
+  const url = new URL(request.url)
+  const isStaticAsset = url.pathname.startsWith('/_next/static/') ||
+    ASSETS_TO_CACHE.includes(url.pathname) ||
+    /\.(?:png|jpe?g|svg|ico|webp|css|js|woff2?)$/i.test(url.pathname)
 
   if (isStaticAsset) {
-    event.respondWith(
-      caches.match(request).then((cachedResponse) => {
-        const fetchPromise = fetch(request).then((networkResponse) => {
-          if (networkResponse.status === 200) {
-            const cacheClone = networkResponse.clone()
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, cacheClone)
-            })
-          }
-          return networkResponse
-        })
-        return cachedResponse || fetchPromise
-      })
-    )
+    event.respondWith((async () => {
+      const cachedResponse = await caches.match(request)
+      const networkPromise = updateCache(request)
+      if (cachedResponse) return cachedResponse
+
+      const networkResponse = await networkPromise
+      return networkResponse || Response.error()
+    })())
     return
   }
 

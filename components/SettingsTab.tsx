@@ -1,12 +1,13 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { Volume2, Smartphone, Download, RotateCcw, FolderOpen, Clipboard, Repeat, Coffee, Mail } from 'lucide-react'
+import { Volume2, Smartphone, Download, RotateCcw, FolderOpen, Clipboard, Repeat, Coffee, Mail, Upload } from 'lucide-react'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { ScanSettings } from '@/hooks/useScanSettings'
+import { DEFAULT_SCAN_SOUND_URL, ScanSettings } from '@/hooks/useScanSettings'
+import { toast } from 'sonner'
 
 interface SettingsTabProps {
   settings: ScanSettings
@@ -30,10 +31,39 @@ export function SettingsTab({
   onConnectFolder,
 }: SettingsTabProps) {
   const [isMounted, setIsMounted] = useState(false)
+  const soundInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setIsMounted(true)
   }, [])
+
+  const handleSoundUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    if (!file.type.startsWith('audio/')) {
+      toast.error('Please upload an audio file')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result !== 'string') {
+        toast.error('Could not read sound file')
+        return
+      }
+      onUpdateSetting('scanSoundUrl', reader.result)
+      toast.success('Scan sound updated')
+    }
+    reader.onerror = () => toast.error('Could not read sound file')
+    reader.readAsDataURL(file)
+  }
+
+  const resetScanSound = () => {
+    onUpdateSetting('scanSoundUrl', DEFAULT_SCAN_SOUND_URL)
+    toast.success('Default scan sound restored')
+  }
 
   if (!isMounted) return <div className="w-full h-full bg-background" />
   const container = {
@@ -86,6 +116,49 @@ export function SettingsTab({
               }
               aria-label="Toggle sound notifications"
             />
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={item}
+          className="bg-card/50 border border-border rounded-xl p-4 backdrop-blur-sm"
+        >
+          <input
+            ref={soundInputRef}
+            type="file"
+            accept="audio/*"
+            className="hidden"
+            onChange={handleSoundUpload}
+          />
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
+                <Upload className="w-5 h-5 text-purple-500" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-semibold text-foreground">Upload Scan Sound</h3>
+                <p className="text-xs text-muted-foreground truncate">Use a custom audio file for QR detection</p>
+              </div>
+            </div>
+            <div className="flex gap-2 shrink-0">
+              {settings.scanSoundUrl !== DEFAULT_SCAN_SOUND_URL && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={resetScanSound}
+                  className="rounded-full h-8 px-3 text-xs font-semibold"
+                >
+                  Default
+                </Button>
+              )}
+              <Button
+                size="sm"
+                onClick={() => soundInputRef.current?.click()}
+                className="rounded-full h-8 px-4 text-xs font-semibold bg-primary hover:bg-primary/90"
+              >
+                Upload
+              </Button>
+            </div>
           </div>
         </motion.div>
 

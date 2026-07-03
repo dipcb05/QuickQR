@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 
 export interface ScanSettings {
   soundEnabled: boolean
+  scanSoundUrl: string
   vibrationEnabled: boolean
   autoCopyToClipboard: boolean
   continuousScan: boolean
@@ -15,9 +16,12 @@ interface UseScanSettingsReturn {
   resetSettings: () => void
 }
 
+export const DEFAULT_SCAN_SOUND_URL = 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'
+
 const STORAGE_KEY = 'scan-settings'
 const DEFAULT_SETTINGS: ScanSettings = {
   soundEnabled: true,
+  scanSoundUrl: DEFAULT_SCAN_SOUND_URL,
   vibrationEnabled: true,
   autoCopyToClipboard: false,
   continuousScan: false,
