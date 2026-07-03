@@ -1,34 +1,31 @@
-export interface WebLinkInfo {
+export interface ScannableLinkInfo {
   raw: string
   normalized: string
   label: string
+  scheme: string
 }
 
-const BARE_DOMAIN_PATTERN = /^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+(?:[/?#][^\s]*)?$/i
+const URI_SCHEME_PATTERN = /^[a-z][a-z0-9+.-]*:/i
+const BLOCKED_SCHEMES = new Set(['javascript:', 'data:', 'blob:'])
 
-export function getWebLinkInfo(text: string): WebLinkInfo | null {
+export function getScannableLinkInfo(text: string): ScannableLinkInfo | null {
   const value = text.trim()
-  if (!value) return null
-
-  const normalized = normalizeWebLink(value)
-  if (!normalized) return null
+  if (!value || !URI_SCHEME_PATTERN.test(value) || /\s/.test(value)) return null
 
   try {
-    const parsed = new URL(normalized)
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null
+    const parsed = new URL(value)
+    const scheme = parsed.protocol.toLowerCase()
+    if (BLOCKED_SCHEMES.has(scheme)) return null
 
     return {
       raw: value,
       normalized: parsed.toString(),
-      label: parsed.toString().replace(/^https?:\/\//i, ''),
+      label: parsed.toString(),
+      scheme: scheme.replace(/:$/, ''),
     }
   } catch {
     return null
   }
 }
 
-function normalizeWebLink(value: string): string | null {
-  if (/^https?:\/\//i.test(value)) return value
-  if (BARE_DOMAIN_PATTERN.test(value)) return `https://${value}`
-  return null
-}
+export const getWebLinkInfo = getScannableLinkInfo
